@@ -190,7 +190,8 @@ class Adam(Optimizer):
                learning_rate: Union[float, LearningRateSchedule] = 0.001,
                beta1: float = 0.9,
                beta2: float = 0.999,
-               epsilon: float = 1e-08):
+               epsilon: float = 1e-08,
+               **kwargs):
     """Construct an Adam optimizer.
 
     Parameters
@@ -208,6 +209,7 @@ class Adam(Optimizer):
     self.beta1 = beta1
     self.beta2 = beta2
     self.epsilon = epsilon
+    self.kwargs = kwargs
 
   def _create_tf_optimizer(self, global_step):
     import tensorflow as tf
@@ -218,7 +220,8 @@ class Adam(Optimizer):
     return tf.keras.optimizers.Adam(learning_rate=learning_rate,
                                     beta_1=self.beta1,
                                     beta_2=self.beta2,
-                                    epsilon=self.epsilon)
+                                    epsilon=self.epsilon,
+                                    **self.kwargs)
 
   def _create_pytorch_optimizer(self, params):
     import torch
@@ -226,7 +229,7 @@ class Adam(Optimizer):
       lr = self.learning_rate.initial_rate
     else:
       lr = self.learning_rate
-    return torch.optim.Adam(params, lr, (self.beta1, self.beta2), self.epsilon)
+    return torch.optim.Adam(params, lr, (self.beta1, self.beta2), self.epsilon, **self.kwargs)
 
   def _create_jax_optimizer(self):
     import optax
